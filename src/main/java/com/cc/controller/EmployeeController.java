@@ -2,6 +2,7 @@ package com.cc.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.cc.common.Result;
 import com.cc.pojo.Employee;
 import com.cc.service.EmployeeService;
@@ -64,9 +65,25 @@ public class EmployeeController {
         }else {
             log.info("登陆成功，账户存入session");
             //员工id存入session，
-            request.getSession().setAttribute("employ",empResult.getId());
+            request.getSession().setAttribute("employee",empResult.getId());
             return Result.success("登陆成功");
         }
+    }
+
+    /**
+     * @param request 删除request作用域中的session对象，就按登陆的request.getSession().setAttribute("employ",empResult.getId());删除employee就行
+     * @return
+     */
+    @PostMapping("/logout")
+    public Result login(HttpServletRequest request) {
+        //尝试删除
+        try {
+            request.getSession().removeAttribute("employee");
+        }catch (Exception e){
+            //删除失败
+            return Result.error("登出失败");
+        }
+        return Result.success("登出成功");
     }
 
 }
