@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -84,6 +85,35 @@ public class EmployeeController {
             return Result.error("登出失败");
         }
         return Result.success("登出成功");
+    }
+
+
+    /**
+     * @param httpServletRequest 获取当前操作人员的session id用
+     * @param employee 将员工的数据解析为employee对象
+     *                 前端json{name: "", phone: "", sex: "", idNumber: "", username: ""}
+     * @return
+     */
+    @PostMapping("/")
+    public Result addEmployee(HttpServletRequest httpServletRequest,@RequestBody Employee employee) {
+        //设置默认密码，顺手加密了
+        employee.setPassword(MD5Util.getMD5("123456"));
+        //设置修改时间
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+        //账户默认状态0
+        employee.setStatus(0);
+        //获取当前新增操作人员的id
+        Long empId= (Long) httpServletRequest.getSession().getAttribute("employee");
+        employee.setCreateUser(empId);
+        employee.setUpdateUser(empId);
+        //MP自动CRUD的功能，封装好了save方法
+        Boolean result=employeeService.save(employee);
+        if (result==true){
+            return Result.success("插入成功");
+        }
+        log.info("插入报错");
+        return Result.error("插入报错");
     }
 
 }

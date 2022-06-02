@@ -1,16 +1,16 @@
 package com.cc.pojo;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 public class Employee implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
+    @TableId(value="id",type=IdType.ASSIGN_ID)
     private Long id;
 
     private String username;
@@ -36,5 +36,6 @@ public class Employee implements Serializable {
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private Long updateUser;
+
 
 }

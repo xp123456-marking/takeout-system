@@ -47,7 +47,8 @@
       if (res.data.code === 0 && res.data.msg === 'NOTLOGIN') {// 返回登录页面
         console.log('---/backend/page/login/login.html---')
         localStorage.removeItem('userInfo')
-        window.top.location.href = '../page/login/login.html'
+        /*window.top.location.href = '../page/login/login.html' 老版本不知道为什么不给跳转，这里直接给一个具体的跳转*/
+        window.top.location.href = '/backend/page/login/login.html'
       } else {
         return res.data
       }
