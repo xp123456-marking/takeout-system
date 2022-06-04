@@ -94,7 +94,7 @@ public class EmployeeController {
      *                 前端json{name: "", phone: "", sex: "", idNumber: "", username: ""}
      * @return
      */
-    @PostMapping("/")
+    @PostMapping("")
     public Result addEmployee(HttpServletRequest httpServletRequest,@RequestBody Employee employee) {
         //设置默认密码，顺手加密了
         employee.setPassword(MD5Util.getMD5("123456"));
@@ -108,12 +108,8 @@ public class EmployeeController {
         employee.setCreateUser(empId);
         employee.setUpdateUser(empId);
         //MP自动CRUD的功能，封装好了save方法
-        Boolean result=employeeService.save(employee);
-        if (result==true){
-            return Result.success("插入成功");
-        }
-        log.info("插入报错");
-        return Result.error("插入报错");
+        employeeService.save(employee);
+        return Result.success("插入成功");
     }
 
 }
