@@ -2,7 +2,7 @@ package com.cc.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.api.R;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cc.common.Result;
 import com.cc.pojo.Employee;
 import com.cc.service.EmployeeService;
@@ -10,15 +10,12 @@ import com.cc.utils.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -87,7 +84,6 @@ public class EmployeeController {
         return Result.success("登出成功");
     }
 
-
     /**
      * @param httpServletRequest 获取当前操作人员的session id用
      * @param employee 将员工的数据解析为employee对象
@@ -110,6 +106,19 @@ public class EmployeeController {
         //MP自动CRUD的功能，封装好了save方法
         employeeService.save(employee);
         return Result.success("插入成功");
+    }
+
+    /**
+     * 分页展示员工列表接口、查询某个员工
+     * @param page 查询第几页
+     * @param pageSize 每页一共几条数据
+     * @param name 查询名字=name的数据
+     * @return 返回Page页
+     */
+    @GetMapping("/page")
+    public Result<Page> page(int page, int pageSize,String name){
+
+        return null;
     }
 
 }

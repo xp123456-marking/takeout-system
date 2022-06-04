@@ -11,7 +11,6 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 @Slf4j
 @SpringBootApplication
 @ServletComponentScan
-@MapperScan("com.cc.mapper")
 public class TakeOutApplication {
     public static void main(String[] args) {
         SpringApplication.run(TakeOutApplication.class);

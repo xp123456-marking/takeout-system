@@ -58,19 +58,19 @@
             <scope>compile</scope>
         </dependency>
 
-        <!--MP-->
+        <!--mybatis-plus依赖-->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.3.1</version>
+            <version>3.4.3</version>
         </dependency>
 
-        <!--mybatis-plus 代码生成器依赖-->
-        <dependency>
+        <!--mybatis-plus 代码生成器依赖，和分页插件冲突，先注掉-->
+       <!-- <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-generator</artifactId>
             <version>3.3.2</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
