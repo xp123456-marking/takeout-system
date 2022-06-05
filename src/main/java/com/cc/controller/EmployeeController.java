@@ -10,6 +10,7 @@ import com.cc.utils.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServlet;
@@ -64,7 +65,8 @@ public class EmployeeController {
             log.info("登陆成功，账户存入session");
             //员工id存入session，
             request.getSession().setAttribute("employee",empResult.getId());
-            return Result.success("登陆成功");
+            //把员工对象存入localStorage作用域
+            return Result.success(employee);
         }
     }
 
@@ -117,8 +119,39 @@ public class EmployeeController {
      */
     @GetMapping("/page")
     public Result<Page> page(int page, int pageSize,String name){
+        //分页构造器,Page(第几页, 查几条)
+        Page pageInfo = new Page(page, pageSize);
+        //查询构造器
+        LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper();
+        //过滤条件.like(什么条件下启用模糊查询，模糊查询字段，被模糊插叙的名称)
+        lambdaQueryWrapper.like(!StringUtils.isEmpty(name), Employee::getName, name);
+        //添加排序
+        lambdaQueryWrapper.orderByDesc(Employee::getCreateTime);
+        //查询分页、自动更新
+        employeeService.page(pageInfo, lambdaQueryWrapper);
+        //返回查询结果
+        return Result.success(pageInfo);
+    }
 
-        return null;
+
+    /**
+     * 更新员工状态，是PUT请求
+     * @param httpServletRequest
+     * @param employee
+     * @return
+     */
+    @PutMapping()
+    public Result<Employee> updateState(HttpServletRequest httpServletRequest,@RequestBody Employee employee){
+        //从Request作用域中拿到员工ID
+        Long empId = (Long) httpServletRequest.getSession().getAttribute("employee");
+        //拿新的状态值
+        employee.setStatus(employee.getStatus());
+        //更新时间
+        employee.setUpdateTime(LocalDateTime.now());
+        //更新处理人id
+        employee.setUpdateUser(empId);
+        employeeService.updateById(employee);
+        return Result.success(employee);
     }
 
 }

@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
  * MybatisPlus分页插件配置类
  */
 @Configuration
-@MapperScan("com.cc.blog.dao.mapper")
+@MapperScan("com.cc.mapper")
 public class MybatisPlusConfig {
 
     //分页插件
