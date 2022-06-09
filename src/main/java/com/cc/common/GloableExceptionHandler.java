@@ -43,4 +43,16 @@ public class GloableExceptionHandler {
         }
         return Result.error("失败了");
     }
+
+    /**
+     * 自定义的全局异常处理
+     * @param customerException 自定义异常对象
+     * @return
+     */
+    @ExceptionHandler({CustomerException.class})
+    public Result<String> exceptionHandlerCustomer(CustomerException customerException){
+        log.error(customerException.getMessage());
+        //直接返回处理信息
+        return Result.error(customerException.getMessage());
+    }
 }
