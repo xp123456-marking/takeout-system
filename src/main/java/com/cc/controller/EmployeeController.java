@@ -6,17 +6,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cc.common.Result;
 import com.cc.pojo.Employee;
 import com.cc.service.EmployeeService;
+import com.cc.utils.BaseContext;
 import com.cc.utils.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * <p>
@@ -30,6 +28,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
+
+    ThreadLocal threadLocal = new ThreadLocal();
 
     @Autowired
     private EmployeeService employeeService;
@@ -65,6 +65,8 @@ public class EmployeeController {
             log.info("登陆成功，账户存入session");
             //员工id存入session，
             request.getSession().setAttribute("employee",empResult.getId());
+            //引入BaseContext的工具类，将存入session的员工信息拿出来，保存到ThreadLocal下，方便拿不到Request的类获取用户Id
+            BaseContext.setCurrentId(empResult.getId());
             //把员工对象存入localStorage作用域
             return Result.success(employee);
         }
@@ -133,7 +135,6 @@ public class EmployeeController {
         return Result.success(pageInfo);
     }
 
-
     /**
      * 更新员工状态，是PUT请求
      * @param httpServletRequest
@@ -141,7 +142,8 @@ public class EmployeeController {
      * @return
      */
     @PutMapping()
-    public Result<Employee> updateState(HttpServletRequest httpServletRequest,@RequestBody Employee employee){
+    public Result<Employee> update(HttpServletRequest httpServletRequest,@RequestBody Employee employee){
+        System.out.println("更新"+Thread.currentThread().getName());
         //从Request作用域中拿到员工ID
         Long empId = (Long) httpServletRequest.getSession().getAttribute("employee");
         //拿新的状态值
@@ -152,6 +154,21 @@ public class EmployeeController {
         employee.setUpdateUser(empId);
         employeeService.updateById(employee);
         return Result.success(employee);
+    }
+
+
+    /**
+     * 拿到员工资料，前端自动填充列表，更新的时候复用上面的update方法
+     * @param id ResultFul风格传入参数，用@PathVariable来接收同名参数
+     * @return 返回员工对象
+     */
+    @GetMapping("/{id}")
+    public Result<Employee> getEmployee(@PathVariable Long id){
+        Employee employee = employeeService.getById(id);
+        if (employee!=null){
+            return Result.success(employee);
+        }
+        return Result.error("没有查到员工信息");
     }
 
 }
