@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cc.common.Result;
 import com.cc.pojo.Category;
 import com.cc.service.CategoryService;
+import com.cc.utils.BaseContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -57,10 +58,27 @@ public class CategoryController {
     }
 
 
+    /**
+     * 删除菜品种类
+     * @param id 分类ID
+     * @return
+     */
     @DeleteMapping()
     public Result<String> delCategory(Long id){
         categoryService.removeCategory(id);
         return Result.success("删除成功");
+    }
+
+    /**
+     * 更新菜品分类
+     *
+     * @param category 传回来的菜品分类对象
+     */
+    @PutMapping()
+    public Result<String> updateCategory(@RequestBody Category category) {
+        log.info("更新种类{}", category);
+        categoryService.updateById(category);
+        return Result.success("菜品种类更新完成");
     }
 
 }
