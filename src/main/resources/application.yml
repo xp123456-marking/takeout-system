@@ -28,3 +28,7 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: ASSIGN_ID
+
+#自定义的文件上传存储位置
+takeOutFile:
+  fileLocaltion: D:\JavaProject\takeOutUploadFile\
