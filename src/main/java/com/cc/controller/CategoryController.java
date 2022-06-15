@@ -2,6 +2,7 @@ package com.cc.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cc.common.Result;
 import com.cc.pojo.Category;
@@ -10,6 +11,8 @@ import com.cc.utils.BaseContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -47,7 +50,7 @@ public class CategoryController {
      * @return
      */
     @GetMapping("page")
-    public Result<Page> page(int page,int pageSize){
+    public Result<Page> listCategory(int page,int pageSize){
         //分页构造器
         Page pageInfo = new Page(page, pageSize);
         //过滤条件
@@ -79,6 +82,26 @@ public class CategoryController {
         log.info("更新种类{}", category);
         categoryService.updateById(category);
         return Result.success("菜品种类更新完成");
+    }
+
+
+    /**
+     * 菜品新增页面菜品下拉列表
+     * @param category 从前端接收一个type=1的标注，目的是在分类表中，菜品分类是1，套餐分类是2，把二者区分开
+     * @return
+     */
+    @GetMapping("/list")
+    public Result<List> listShowCategory(Category category){
+        //条件构造器
+        LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper();
+        //MP也支持把对象先判断一下，非空才能进行查询
+        //lambdaQueryWrapper.eq(category != null, Category::getType, category.getType());
+        lambdaQueryWrapper.eq(Category::getType, category.getType());
+        //按时间倒叙排序
+        lambdaQueryWrapper.orderByDesc(Category::getUpdateTime);
+        //查询
+        List<Category> categoryList = categoryService.list(lambdaQueryWrapper);
+        return Result.success(categoryList);
     }
 
 }
