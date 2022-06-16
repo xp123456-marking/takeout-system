@@ -1,5 +1,6 @@
 package com.cc.service;
 
+import com.cc.dto.DishDto;
 import com.cc.pojo.Dish;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -12,5 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2022-05-30
  */
 public interface DishService extends IService<Dish> {
-
+    public DishDto getByIdWithFlavor(Long id);
 }
