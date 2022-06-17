@@ -37,13 +37,17 @@ public class DishController {
     private CategoryService categoryService;
 
 
+    /**
+     * 新增菜品
+     * @param dishDto 传输对象
+     * @return
+     */
     @PostMapping()
-    public Result<DishDto> addDish(@RequestBody DishDto dishDto) {
+    public Result<String> addDish(@RequestBody DishDto dishDto) {
         log.info(dishDto.toString());
-
-        return null;
+        dishService.addDishWithFlavor(dishDto);
+        return Result.success("保存成功");
     }
-
 
 
     /**
@@ -98,7 +102,7 @@ public class DishController {
 
 
     /**
-     * 修改菜品信息
+     * 修改菜品信息的回显功能，填充到修改页面为修改菜品做准备
      * @param id 菜品id
      * @return
      */
@@ -109,5 +113,61 @@ public class DishController {
         return Result.success(dishDto);
     }
 
+    /**
+     * 更新菜品操作
+     * @param dishDto
+     * @return
+     */
+    @PutMapping()
+    public Result<String> updateDish(@RequestBody DishDto dishDto) {
+        log.info(dishDto.toString());
+        dishService.updateDishWithFlavor(dishDto);
+        return Result.success("更新成功");
+    }
 
+
+    /**
+     * 更新菜品为停售
+     * @param ids Dish的id
+     * @return
+     */
+    @PostMapping("/status/0")
+    public Result<String> updateStatusStop(Long ids){
+        Dish dish=dishService.getById(ids);
+        dish.setStatus(0);
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Dish::getId, ids);
+        dishService.update(dish, lambdaQueryWrapper);
+        return Result.success("更新成功");
+    }
+
+    /**
+     * 更新菜品状态为起售
+     * @param ids Dish的id
+     * @return
+     */
+    @PostMapping("/status/1")
+    public Result<String> updateStatusStart(Long ids){
+        Dish dish=dishService.getById(ids);
+        dish.setStatus(1);
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Dish::getId, ids);
+        dishService.update(dish, lambdaQueryWrapper);
+        return Result.success("更新成功");
+    }
+
+    /**
+     * 这里是逻辑删除，不是真删，把isDeleted字段更新为1就不显示了，间接完成了逻辑删除
+     * @param ids Dish的id
+     * @return
+     */
+    @DeleteMapping()
+    public Result<String> deleteDish(Long ids){
+        Dish dish=dishService.getById(ids);
+        dish.setIsDeleted(1);
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(Dish::getId, ids);
+        dishService.update(dish, lambdaQueryWrapper);
+        return Result.success("删除成功");
+    }
 }

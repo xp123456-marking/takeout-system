@@ -14,4 +14,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface DishService extends IService<Dish> {
     public DishDto getByIdWithFlavor(Long id);
+
+    public void addDishWithFlavor(DishDto dishDto);
+
+    public void updateDishWithFlavor(DishDto dishDto);
+
 }
