@@ -24,4 +24,23 @@
         id, category_id, name, price, status, code, description, image, create_time, update_time, create_user, update_user, is_deleted
     </sql>
 
+    <!--套餐分页+模糊查询-->
+    <select id="listSetmeal" resultType="com.cc.dto.SetmealDto">
+        select s.*,c.name as categoryName
+        From setmeal s,category c
+        Where s.category_id=c.id
+        <if test="name!=null">
+        and
+            c.name like '%' #{name} '%'
+        </if>
+        limit #{page} , #{pageSize}
+    </select>
+    <select id="getSetmealData" resultType="com.cc.dto.SetmealDto">
+        select s.*, c.name as categoryName
+        From setmeal s,
+             category c
+        where s.category_id=c.id and s.id = #{id};
+    </select>
+
+
 </mapper>

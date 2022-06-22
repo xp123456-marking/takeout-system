@@ -1,7 +1,10 @@
 package com.cc.service;
 
+import com.cc.dto.SetmealDto;
 import com.cc.pojo.Setmeal;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface SetmealService extends IService<Setmeal> {
 
+    public void saveWithDish(SetmealDto setmealDto);
+
+    public SetmealDto getSetmealData(Long id);
+
+    public void removeWithDish(List<Long> ids);
 }

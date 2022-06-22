@@ -170,4 +170,25 @@ public class DishController {
         dishService.update(dish, lambdaQueryWrapper);
         return Result.success("删除成功");
     }
+
+
+    /**
+     * 新增套餐时 根据条件查询并填充菜品列表
+     * @param dish 这里本来是categoryId的，但是为了保证通用性，这里用Dish对象进行封装 有更好的通用性
+     *             Dish本身里面也是有categoryId的
+     * @return
+     */
+    @GetMapping("/list")
+    public Result<List<Dish>> listCategory(Dish dish){
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //查询
+        lambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        //只查在售状态的菜品，1为启售状态
+        lambdaQueryWrapper.eq(Dish::getStatus, 1);
+        //排序，多个字段排序，先按Sort排，再按UpdateTime排
+        lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+        List<Dish> dishList = dishService.list(lambdaQueryWrapper);
+        return Result.success(dishList);
+    }
+
 }
