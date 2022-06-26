@@ -4,12 +4,14 @@ package com.cc.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.cc.common.Result;
 import com.cc.pojo.ShoppingCart;
+import com.cc.pojo.User;
 import com.cc.service.ShoppingCartService;
 import com.cc.utils.BaseContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -78,6 +80,7 @@ public class ShoppingCartController {
             /*
                 insert into shopping_cart (ShoppingCart解析出来的字段) values (ShoppingCart解析出来的数据)
             */
+            shoppingCart.setCreateTime(LocalDateTime.now());
             shoppingCartService.save(shoppingCart);
             //因为这个分支的cartServiceOne是null，所以要覆盖一下
             cartServiceOne = shoppingCart;
@@ -99,6 +102,20 @@ public class ShoppingCartController {
         List<ShoppingCart> list = shoppingCartService.list(queryWrapper);
 
         return Result.success(list);
+    }
+
+    /**
+     * 一次性清空购物车
+     * @return
+     */
+    @DeleteMapping("/clean")
+    public Result<String> clean(){
+        //获取当前购物车用户Id
+        Long userId = BaseContext.getCurrentId();
+        LambdaQueryWrapper<ShoppingCart> lambdaQueryWrapper = new LambdaQueryWrapper();
+        lambdaQueryWrapper.eq(ShoppingCart::getUserId, userId);
+        shoppingCartService.remove(lambdaQueryWrapper);
+        return Result.success("清空成功");
     }
 
 }
