@@ -95,8 +95,8 @@ public class CategoryController {
         //条件构造器
         LambdaQueryWrapper<Category> lambdaQueryWrapper = new LambdaQueryWrapper();
         //MP也支持把对象先判断一下，非空才能进行查询
-        //lambdaQueryWrapper.eq(category != null, Category::getType, category.getType());
-        lambdaQueryWrapper.eq(Category::getType, category.getType());
+        lambdaQueryWrapper.eq(category.getType() != null, Category::getType, category.getType());
+        //lambdaQueryWrapper.eq(Category::getType, category.getType());
         //按时间倒叙排序
         lambdaQueryWrapper.orderByDesc(Category::getUpdateTime);
         //查询

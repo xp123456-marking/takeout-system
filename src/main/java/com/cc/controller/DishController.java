@@ -7,7 +7,9 @@ import com.cc.common.Result;
 import com.cc.dto.DishDto;
 import com.cc.pojo.Category;
 import com.cc.pojo.Dish;
+import com.cc.pojo.DishFlavor;
 import com.cc.service.CategoryService;
+import com.cc.service.DishFlavorService;
 import com.cc.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -36,6 +38,8 @@ public class DishController {
     @Autowired
     private CategoryService categoryService;
 
+    @Autowired
+    private DishFlavorService dishFlavorService;
 
     /**
      * 新增菜品
@@ -178,7 +182,7 @@ public class DishController {
      *             Dish本身里面也是有categoryId的
      * @return
      */
-    @GetMapping("/list")
+    /* @GetMapping("/list")
     public Result<List<Dish>> listCategory(Dish dish){
         LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         //查询
@@ -189,6 +193,47 @@ public class DishController {
         lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
         List<Dish> dishList = dishService.list(lambdaQueryWrapper);
         return Result.success(dishList);
-    }
+    }*/
 
+    @GetMapping("/list")
+    public Result<List<DishDto>> listCategory(Dish dish){
+        LambdaQueryWrapper<Dish> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        //查询
+        lambdaQueryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
+        //只查在售状态的菜品，1为启售状态
+        lambdaQueryWrapper.eq(Dish::getStatus, 1);
+        //排序，多个字段排序，先按Sort排，再按UpdateTime排
+        lambdaQueryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> dishList = dishService.list(lambdaQueryWrapper);
+        //要在这个基础上追加出来flavor的菜品表，复用上面的内容
+        //将List集合搬入Dto中
+        //这里是流式编程的内容，或者用foreach来进行搬运也可以解决
+        List<DishDto> dishDtoList = dishList.stream().map((item) -> {
+            DishDto dishDto = new DishDto();
+            BeanUtils.copyProperties(item,dishDto);
+
+            Long categoryId = item.getCategoryId();//分类id
+
+            //根据id查询分类对象，赋值categoryName
+            Category category = categoryService.getById(categoryId);
+
+            if(category != null){
+                String categoryName = category.getName();
+                dishDto.setCategoryName(categoryName);
+            }
+
+            //根据当前菜品的id查询菜品表下dishId对应的菜品
+            Long dishId = item.getId();
+            LambdaQueryWrapper<DishFlavor> dishFlavorLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId, dishId);
+            List<DishFlavor> dishFlavorList = dishFlavorService.list(dishFlavorLambdaQueryWrapper);
+
+            dishDto.setFlavors(dishFlavorList);
+
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        return Result.success(dishDtoList);
+    }
 }

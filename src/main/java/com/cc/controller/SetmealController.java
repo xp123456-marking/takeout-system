@@ -121,4 +121,28 @@ public class SetmealController {
         setmealService.update(setmeal, lambdaQueryWrapper);
         return Result.success("更新状态为停售");
     }
+
+    /**
+     * 消费者前台页面显示套餐相关的内容
+     * 这里不能用RequestBody注解接收参数，是因为传来的参数不是完整的对象并且不是Json，只是对象的一部分
+     * 用k-v形式进行传输，所以不能用RequestBody接收
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")  // 在消费者端 展示套餐信息
+    public Result<List<Setmeal>> list(Setmeal setmeal){
+        LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
+        Long categoryId = setmeal.getCategoryId();
+        Integer status = setmeal.getStatus();
+        //种类不为空才查
+        queryWrapper.eq(categoryId != null,Setmeal::getCategoryId,categoryId);
+        //在售状态才查
+        queryWrapper.eq(status != null,Setmeal::getStatus,status);
+
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+
+        List<Setmeal> setmeals = setmealService.list(queryWrapper);
+
+        return Result.success(setmeals);
+    }
 }

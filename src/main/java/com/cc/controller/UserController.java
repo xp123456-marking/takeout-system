@@ -90,8 +90,6 @@ public class UserController {
                 user.setStatus(1);
                 userService.save(user);
             }
-            //已经可以登陆放行了，就删了session中的code再放行，减轻session压力
-            codeInSession.removeAttribute(phone);
             //把用户的ID存入Session，留给过滤器进行验证放行
             codeInSession.setAttribute("user", user.getId());
             return Result.success("登陆成功，欢迎~");
