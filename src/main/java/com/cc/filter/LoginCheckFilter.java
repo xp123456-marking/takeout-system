@@ -33,7 +33,9 @@ public class LoginCheckFilter implements Filter {
             "/employee/login",
             "/employee/login",
             "/backend/**",
-            "/front/**"
+            "/front/**",
+            "/user/sendMsg",
+            "/user/login"
         };
         //判断这个路径是否直接放行
         Boolean cheakUrl = checkUrl(urls, requestUrl);
@@ -44,14 +46,24 @@ public class LoginCheckFilter implements Filter {
             //放行完了直接结束就行
             return;
         }
-        //判断用户已经登陆可以放行
+        //判断用户已经登陆可以放行（PC后台版）
         if (httpServletRequest.getSession().getAttribute("employee") != null){
-            log.info("用户已登录");
+            log.info("后台用户已登录");
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             //获取当前新增操作人员的id
             Long empId= (Long) httpServletRequest.getSession().getAttribute("employee");
             //存入LocalThread
             BaseContext.setCurrentId(empId);
+            //放行完了直接结束就行
+            return;
+        }//判断用户已经登陆可以放行（移动端前台版）
+        if (httpServletRequest.getSession().getAttribute("user") != null){
+            log.info("前台用户已登录");
+            filterChain.doFilter(httpServletRequest, httpServletResponse);
+            //获取当前新增操作人员的id
+            Long userId= (Long) httpServletRequest.getSession().getAttribute("user");
+            //存入LocalThread
+            BaseContext.setCurrentId(userId);
             //放行完了直接结束就行
             return;
         }
