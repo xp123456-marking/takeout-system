@@ -30,7 +30,13 @@ public class AddressBookController {
      */
     @PostMapping
     public Result<AddressBook> save(@RequestBody AddressBook addressBook) {
-        addressBook.setUserId(BaseContext.getCurrentId());
+        Long userId = BaseContext.getCurrentId();
+        /*
+        * 这里留了个坑，我把数据库create_Id和更新时间等字段改成了非空了，算是遗留Bug
+        * 不知道为什么BaseContext拿不到用户Id数据，所以拿不到create_Id
+        *
+        * */
+        addressBook.setUserId(userId);
         log.info("addressBook:{}", addressBook);
         addressBookService.save(addressBook);
         return Result.success(addressBook);
