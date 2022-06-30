@@ -14,6 +14,8 @@ import com.cc.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +48,9 @@ public class DishController {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private RedisCacheManager redisCacheManager;
 
     /**
      * 新增菜品
@@ -116,10 +121,12 @@ public class DishController {
      * @param id 菜品id
      * @return
      */
+    @CachePut(value = "userCache",key="#dishDto.id")
     @GetMapping("/{id}")
     public Result<DishDto> updateDish(@PathVariable Long id){
         //因为是直接查Dto数据嘛，用现成的肯定不行了，在Service层自己写，这是个多表联查的过程
         DishDto dishDto=dishService.getByIdWithFlavor(id);
+
         return Result.success(dishDto);
     }
 

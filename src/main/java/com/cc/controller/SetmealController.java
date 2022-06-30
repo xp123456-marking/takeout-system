@@ -14,6 +14,8 @@ import com.cc.service.SetmealService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -46,6 +48,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping()
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public Result<String> saveSetmeal(@RequestBody SetmealDto setmealDto) {
         log.info(setmealDto.toString());
         //因为是两张表关联查询，所以MP直接查是不可以的，自己写一个，把两个信息关联起来存储
@@ -91,6 +94,7 @@ public class SetmealController {
      * @return
      */
     @DeleteMapping()
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public Result<String> deleteSetmeal(@RequestParam List<Long> ids){
         log.info("ids:{}", ids);
         setmealService.removeWithDish(ids);
@@ -130,6 +134,7 @@ public class SetmealController {
      * @return
      */
     @GetMapping("/list")  // 在消费者端 展示套餐信息
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId+'_'+#setmeal.status")
     public Result<List<Setmeal>> list(Setmeal setmeal){
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         Long categoryId = setmeal.getCategoryId();
