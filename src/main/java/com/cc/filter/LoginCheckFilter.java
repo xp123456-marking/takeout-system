@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.cc.common.Result;
 import com.cc.utils.BaseContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.AntPathMatcher;
 
 import javax.servlet.*;
@@ -18,6 +20,10 @@ import java.io.IOException;
 @WebFilter(filterName = "loginCheckFilter", urlPatterns = "/*")
 @Slf4j
 public class LoginCheckFilter implements Filter {
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     //调用Spring核心包的字符串匹配类
     public static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
@@ -47,21 +53,22 @@ public class LoginCheckFilter implements Filter {
             return;
         }
         //判断用户已经登陆可以放行（PC后台版）
-        if (httpServletRequest.getSession().getAttribute("employee") != null){
+
+        if (redisTemplate.opsForValue().get("employee")!= null){
             log.info("后台用户已登录");
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             //获取当前新增操作人员的id
-            Long empId= (Long) httpServletRequest.getSession().getAttribute("employee");
+            Long empId= (Long) redisTemplate.opsForValue().get("employee");
             //存入LocalThread
             BaseContext.setCurrentId(empId);
             //放行完了直接结束就行
             return;
         }//判断用户已经登陆可以放行（移动端前台版）
-        if (httpServletRequest.getSession().getAttribute("user") != null){
+        if (redisTemplate.opsForValue().get("user") != null){
             log.info("前台用户已登录");
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             //获取当前新增操作人员的id
-            Long userId= (Long) httpServletRequest.getSession().getAttribute("user");
+            Long userId= (Long) redisTemplate.opsForValue().get("user");
             //存入LocalThread
             BaseContext.setCurrentId(userId);
             //放行完了直接结束就行
