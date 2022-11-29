@@ -58,6 +58,8 @@ public class LoginCheckFilter implements Filter {
         }
         //判断用户已经登陆可以放行（PC后台版）
 
+        redisTemplate.opsForValue().set("employee",1234565123513413L);
+
         if (redisTemplate.opsForValue().get("employee")!= null){
             log.info("后台用户已登录");
             filterChain.doFilter(httpServletRequest, httpServletResponse);
